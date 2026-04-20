@@ -27,6 +27,7 @@ def procesar_archivo_con_ia(client, modelo_id, limite_tokens, ruta_archivo, text
     prompt = generar_prompt_analisis(texto)
 
     try:
+        tokens_disponibles = limite_tokens - tokens_texto - TOKENS_RESERVA_PROMPT
         response = client.chat.completions.create(
             model=modelo_id,
             messages=[
@@ -34,7 +35,7 @@ def procesar_archivo_con_ia(client, modelo_id, limite_tokens, ruta_archivo, text
                 {"role": "user", "content": prompt}
             ],
             temperature=0.1,  # Baja temperatura para respuestas más deterministas
-            max_tokens=300    # Limitar el tamaño del resumen
+            max_tokens=tokens_disponibles    # Limitar el tamaño del resumen dinámicamente
         )
 
         respuesta_ia = response.choices[0].message.content.strip()

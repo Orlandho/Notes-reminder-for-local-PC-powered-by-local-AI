@@ -1,4 +1,5 @@
 import sys
+import os
 import logging
 
 import gestor_rutas
@@ -7,7 +8,17 @@ import conexion_ia
 import analizador_notas
 import generador_resultados
 
-# Desactivar logs de requests/httpx para no ensuciar la consola
+# Crear carpeta de logs si no existe
+os.makedirs("logs", exist_ok=True)
+
+# Configurar logging para guardar solo WARNING y ERROR en logs/app_logs.txt
+logging.basicConfig(
+    filename=os.path.join("logs", "app_logs.txt"),
+    level=logging.WARNING,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+# Desactivar logs de requests/httpx para no ensuciar el archivo de log innecesariamente
 logging.getLogger("httpx").setLevel(logging.WARNING)
 
 def menu_agregar_ruta():

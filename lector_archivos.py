@@ -3,9 +3,6 @@ from pathlib import Path
 import docx
 import tiktoken
 
-# Setup basic logging
-logging.basicConfig(level=logging.WARNING, format='%(levelname)s: %(message)s')
-
 def extraer_texto(ruta_archivo):
     """Extrae el texto de archivos .txt, .md o .docx."""
     path = Path(ruta_archivo)
