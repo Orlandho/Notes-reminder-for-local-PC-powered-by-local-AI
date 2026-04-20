@@ -58,8 +58,8 @@ def escanear_carpeta(ruta_carpeta):
         return archivos_soportados
 
     try:
-        # Escaneo recursivo
-        for file_path in path_carpeta.rglob("*"):
+        # Escaneo no recursivo (solo el directorio raíz especificado)
+        for file_path in path_carpeta.iterdir():
             if file_path.is_file() and file_path.suffix.lower() in ['.txt', '.md', '.docx']:
                 archivos_soportados.append(str(file_path))
     except Exception as e:

@@ -76,33 +76,45 @@ def iniciar_analisis():
         print("No se encontraron archivos .txt, .md o .docx en las rutas especificadas.")
         return
 
-    print(f"Se encontraron {len(todos_los_archivos)} archivos. Iniciando filtrado y lectura...")
+    if len(todos_los_archivos) > analizador_notas.MAX_NOTAS:
+        print(f"\n[ADVERTENCIA] Se encontraron {len(todos_los_archivos)} archivos. Para evitar saturación, solo se evaluarán los primeros {analizador_notas.MAX_NOTAS}.")
+        todos_los_archivos = todos_los_archivos[:analizador_notas.MAX_NOTAS]
+    else:
+        print(f"Se encontraron {len(todos_los_archivos)} archivos. Iniciando filtrado y lectura...")
 
     notas_procesadas = []
 
     print(f"[3/4] Analizando contenido con IA (Modelo: {modelo_id}) ...")
-    for idx, archivo in enumerate(todos_los_archivos, 1):
-        if len(notas_procesadas) >= analizador_notas.MAX_NOTAS:
-            print(f"\n[INFO] Se ha alcanzado el límite máximo de {analizador_notas.MAX_NOTAS} notas procesadas. Deteniendo escaneo.")
-            break
+    print(f"[!] Puedes presionar CTRL+C en cualquier momento para cancelar el análisis y volver al menú.")
 
-        print(f"   -> Evaluando archivo {idx}/{len(todos_los_archivos)}: {archivo}")
-        texto = lector_archivos.extraer_texto(archivo)
+    try:
+        for idx, archivo in enumerate(todos_los_archivos, 1):
+            if len(notas_procesadas) >= analizador_notas.MAX_NOTAS:
+                print(f"\n[INFO] Se ha alcanzado el límite máximo de {analizador_notas.MAX_NOTAS} notas procesadas. Deteniendo escaneo.")
+                break
 
-        if not texto or not texto.strip():
-            continue
+            print(f"   -> Evaluando archivo {idx}/{len(todos_los_archivos)}: {archivo}")
+            texto = lector_archivos.extraer_texto(archivo)
 
-        tokens_texto = lector_archivos.contar_tokens(texto)
+            if not texto or not texto.strip():
+                continue
 
-        es_nota, resumen = analizador_notas.procesar_archivo_con_ia(
-            client, modelo_id, limite_tokens, archivo, texto, tokens_texto
-        )
+            tokens_texto = lector_archivos.contar_tokens(texto)
 
-        if es_nota and resumen:
-            notas_procesadas.append({
-                "ruta": archivo,
-                "resumen": resumen
-            })
+            es_nota, resumen = analizador_notas.procesar_archivo_con_ia(
+                client, modelo_id, limite_tokens, archivo, texto, tokens_texto
+            )
+
+            if es_nota and resumen:
+                notas_procesadas.append({
+                    "ruta": archivo,
+                    "resumen": resumen
+                })
+    except KeyboardInterrupt:
+        print("\n\n[!] Análisis interrumpido por el usuario (CTRL+C).")
+        if not notas_procesadas:
+            print("No se procesaron notas antes de la interrupción.")
+            return
 
     print(f"\n[4/4] Finalizando y generando resultados...")
     generador_resultados.presentar_resultados(notas_procesadas)
