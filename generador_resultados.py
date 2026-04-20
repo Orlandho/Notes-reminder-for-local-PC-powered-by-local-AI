@@ -1,4 +1,5 @@
 import os
+from colorama import Fore, Style
 
 def presentar_resultados(notas_procesadas):
     """
@@ -11,17 +12,17 @@ def presentar_resultados(notas_procesadas):
     cantidad = len(notas_procesadas)
 
     if cantidad == 0:
-        print("\n[INFO] No se encontraron notas válidas para procesar.\n")
+        print(Fore.YELLOW + "\n[INFO] No se encontraron notas válidas para procesar.\n")
         return
 
-    print(f"\n[INFO] Se han procesado {cantidad} notas exitosamente.")
+    print(Fore.GREEN + f"\n[INFO] Se han procesado {cantidad} notas exitosamente.")
 
     if cantidad <= 20:
-        print("\n--- RESÚMENES DE NOTAS ---")
+        print(Fore.CYAN + Style.BRIGHT + "\n--- RESÚMENES DE NOTAS ---")
         for idx, nota in enumerate(notas_procesadas, 1):
-            print(f"\n[{idx}] Archivo: {nota['ruta']}")
-            print(f"Resumen: {nota['resumen']}")
-            print("-" * 30)
+            print(f"\n{Fore.GREEN}[{idx}]{Style.RESET_ALL} Archivo: {Fore.CYAN}{nota['ruta']}{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}Resumen:{Style.RESET_ALL} {nota['resumen']}")
+            print(Fore.BLUE + "-" * 30)
     else:
         archivo_salida = "resumenes_notas.txt"
         try:
@@ -34,9 +35,9 @@ def presentar_resultados(notas_procesadas):
                     f.write(f"Resumen: {nota['resumen']}\n")
                     f.write("-" * 40 + "\n")
 
-            print(f"\n[ÉXITO] Al ser más de 20 notas, los resúmenes se han guardado en el archivo: {os.path.abspath(archivo_salida)}\n")
+            print(Fore.GREEN + Style.BRIGHT + f"\n[ÉXITO] Al ser más de 20 notas, los resúmenes se han guardado en el archivo: {os.path.abspath(archivo_salida)}\n")
         except Exception as e:
-            print(f"\n[ERROR] No se pudo guardar el archivo de resultados: {e}")
+            print(Fore.RED + f"\n[ERROR] No se pudo guardar el archivo de resultados: {e}")
             # Fallback en caso de error: imprimir de todos modos
             for idx, nota in enumerate(notas_procesadas, 1):
-                print(f"[{idx}] {nota['ruta']}: {nota['resumen']}")
+                print(f"{Fore.GREEN}[{idx}]{Style.RESET_ALL} {Fore.CYAN}{nota['ruta']}{Style.RESET_ALL}: {nota['resumen']}")

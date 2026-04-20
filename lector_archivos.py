@@ -1,10 +1,9 @@
 import logging
 from pathlib import Path
-import docx
 import tiktoken
 
 def extraer_texto(ruta_archivo):
-    """Extrae el texto de archivos .txt, .md o .docx."""
+    """Extrae el texto de archivos .txt o .md."""
     path = Path(ruta_archivo)
     ext = path.suffix.lower()
 
@@ -17,11 +16,6 @@ def extraer_texto(ruta_archivo):
             except UnicodeDecodeError:
                 with open(path, 'r', encoding='latin-1') as f:
                     return f.read()
-
-        elif ext == '.docx':
-            doc = docx.Document(path)
-            texto = [para.text for para in doc.paragraphs]
-            return '\n'.join(texto)
 
         else:
             return None
@@ -57,7 +51,7 @@ def escanear_carpeta(ruta_carpeta):
     try:
         # Escaneo no recursivo (solo el directorio raíz especificado)
         for file_path in path_carpeta.iterdir():
-            if file_path.is_file() and file_path.suffix.lower() in ['.txt', '.md', '.docx']:
+            if file_path.is_file() and file_path.suffix.lower() in ['.txt', '.md']:
                 archivos_soportados.append(str(file_path))
     except Exception as e:
         logging.error(f"Error al escanear carpeta {ruta_carpeta}: {e}")
