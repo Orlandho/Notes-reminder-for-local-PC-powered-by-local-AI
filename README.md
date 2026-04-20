@@ -26,7 +26,7 @@ El sistema fue diseñado pensando tanto en usuarios comunes que buscan organizar
 2. Abre una terminal en la carpeta del proyecto.
 3. Instala las dependencias requeridas ejecutando:
    ```bash
-   pip install openai python-docx tiktoken
+   pip install openai tiktoken
    ```
 
 ---
@@ -50,7 +50,7 @@ Al abrirse, verás el menú interactivo:
 
 1. **Agregar rutas de carpetas:** Pega la ruta de la carpeta de tu computadora donde guardas tus documentos (ej. `C:\Users\MiNombre\Documentos\Apuntes`).
 2. **Quitar rutas de carpetas:** Si ya no quieres escanear una carpeta, puedes quitarla de la lista aquí.
-3. **Iniciar análisis:** El programa te preguntará qué carpetas escanear. Leerá archivos `.txt`, `.md` y `.docx`, los filtrará y la IA te dará resúmenes detallados de los que considere notas útiles.
+3. **Iniciar análisis:** El programa te preguntará qué carpetas escanear. Leerá archivos `.txt` y `.md`, los filtrará y la IA te dará resúmenes detallados de los que considere notas útiles.
 4. **Salir:** Cierra el programa de forma segura.
 
 ---
@@ -58,7 +58,7 @@ Al abrirse, verás el menú interactivo:
 ## ⚙️ Detalles Técnicos (Para Desarrolladores)
 
 *   **Modelos Soportados:** El archivo `modelos.json` incluye una base de datos actualizada de límites de tokens de modelos populares (OpenAI, Google, Meta, Qwen, DeepSeek, etc.).
-*   **Filtro de Extensiones:** Actualmente procesa rigurosamente `.txt`, `.md` y `.docx` para asegurar compatibilidad universal en la lectura del texto.
+*   **Filtro de Extensiones:** Actualmente procesa rigurosamente `.txt` y `.md` para asegurar compatibilidad universal en la lectura del texto.
 *   **Estimador de Tokens:** Utiliza `tiktoken` con fallback a cálculo matemático básico (`palabras * 1.3`) para proteger contra fallos de codificación, asegurando que los envíos a la API no superen la ventana contextual de la IA en uso.
 *   **Prompting One-Shot:** La lógica en `analizador_notas.py` instruye a la IA para responder con un simple "RECHAZADO" o un resumen directo, limitando drásticamente el tiempo de inferencia y las alucinaciones en modelos con baja capacidad paramétrica.
 *   **Arquitectura Modular:** Diseñado para escalar. Las futuras versiones podrán incorporar fácilmente una base de datos vectorial para implementar la función de *Chat sobre documentos (RAG)*.
