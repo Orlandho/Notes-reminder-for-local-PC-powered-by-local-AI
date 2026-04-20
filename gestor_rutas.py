@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 import logging
+from colorama import Fore, Style
 
 CONFIG_FILE = "config_rutas.json"
 
@@ -30,16 +31,16 @@ def agregar_ruta(nueva_ruta, rutas_actuales):
     # Even if it's a Windows path entered on Linux/Mac, Pathlib will store it as string.
     # On actual Windows, path.is_dir() will work. Here we just validate it's not empty.
     if str(path).strip() == "":
-        print("La ruta no puede estar vacía.")
+        print(Fore.RED + "La ruta no puede estar vacía.")
         return rutas_actuales
 
     ruta_str = str(path)
     if ruta_str not in rutas_actuales:
         rutas_actuales.append(ruta_str)
         guardar_rutas(rutas_actuales)
-        print(f"Ruta agregada: {ruta_str}")
+        print(Fore.GREEN + f"Ruta agregada: {ruta_str}")
     else:
-        print("La ruta ya se encuentra configurada.")
+        print(Fore.YELLOW + "La ruta ya se encuentra configurada.")
     return rutas_actuales
 
 def quitar_ruta(ruta_a_quitar, rutas_actuales):
@@ -47,16 +48,16 @@ def quitar_ruta(ruta_a_quitar, rutas_actuales):
     if ruta_a_quitar in rutas_actuales:
         rutas_actuales.remove(ruta_a_quitar)
         guardar_rutas(rutas_actuales)
-        print(f"Ruta eliminada: {ruta_a_quitar}")
+        print(Fore.GREEN + f"Ruta eliminada: {ruta_a_quitar}")
     else:
-        print("La ruta no se encontró en la configuración.")
+        print(Fore.RED + "La ruta no se encontró en la configuración.")
     return rutas_actuales
 
 def verificar_configuracion_lista():
     """Verifica si hay rutas configuradas, de lo contrario devuelve False."""
     rutas = cargar_rutas()
     if not rutas:
-        print("\n[!] ADVERTENCIA: No hay rutas configuradas.")
-        print("    Por favor, agrega al menos una ruta antes de iniciar el análisis.\n")
+        print(Fore.YELLOW + "\n[!] ADVERTENCIA: No hay rutas configuradas.")
+        print(Fore.YELLOW + "    Por favor, agrega al menos una ruta antes de iniciar el análisis.\n")
         return False, rutas
     return True, rutas
