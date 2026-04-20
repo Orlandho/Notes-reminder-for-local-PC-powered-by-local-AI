@@ -34,7 +34,7 @@ def procesar_archivo_con_ia(client, modelo_id, limite_tokens, ruta_archivo, text
                 {"role": "system", "content": "Eres un asistente estricto y conciso."},
                 {"role": "user", "content": prompt}
             ],
-            temperature=0.1,  # Baja temperatura para respuestas más deterministas
+            temperature=0.7,  # Temperatura aumentada para resúmenes más elaborados
             max_tokens=tokens_disponibles    # Limitar el tamaño del resumen dinámicamente
         )
 
