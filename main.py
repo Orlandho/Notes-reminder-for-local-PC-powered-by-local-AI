@@ -88,7 +88,7 @@ def iniciar_analisis():
         todos_los_archivos.extend(archivos)
 
     if not todos_los_archivos:
-        print(Fore.YELLOW + "No se encontraron archivos .txt, .md o .docx en las rutas especificadas.")
+        print(Fore.YELLOW + "No se encontraron archivos .txt o .md en las rutas especificadas.")
         return
 
     if len(todos_los_archivos) > analizador_notas.MAX_NOTAS:
