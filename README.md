@@ -26,7 +26,7 @@ El sistema fue diseñado pensando tanto en usuarios comunes que buscan organizar
 2. Abre una terminal en la carpeta del proyecto.
 3. Instala las dependencias requeridas ejecutando:
    ```bash
-   pip install openai python-docx tiktoken
+   pip install openai python-docx tiktoken colorama
    ```
 
 ---

@@ -7,6 +7,10 @@ import lector_archivos
 import conexion_ia
 import analizador_notas
 import generador_resultados
+from colorama import init, Fore, Style
+
+# Inicializar colorama para soporte en Windows
+init(autoreset=True)
 
 # Crear carpeta de logs si no existe
 os.makedirs("logs", exist_ok=True)
@@ -23,20 +27,20 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 
 def menu_agregar_ruta():
     rutas_actuales = gestor_rutas.cargar_rutas()
-    nueva = input("Ingresa la ruta absoluta de la carpeta a agregar: ").strip()
+    nueva = input(Fore.CYAN + "Ingresa la ruta absoluta de la carpeta a agregar: " + Style.RESET_ALL).strip()
     gestor_rutas.agregar_ruta(nueva, rutas_actuales)
 
 def menu_quitar_ruta():
     rutas_actuales = gestor_rutas.cargar_rutas()
     if not rutas_actuales:
-        print("No hay rutas para quitar.")
+        print(Fore.YELLOW + "No hay rutas para quitar.")
         return
 
-    print("\nRutas configuradas:")
+    print(Fore.CYAN + "\nRutas configuradas:")
     for i, r in enumerate(rutas_actuales, 1):
-        print(f"{i}. {r}")
+        print(f"{Fore.GREEN}{i}.{Style.RESET_ALL} {r}")
 
-    seleccion = input("Ingresa el número de la ruta a quitar (o presiona Enter para cancelar): ").strip()
+    seleccion = input(Fore.CYAN + "Ingresa el número de la ruta a quitar (o presiona Enter para cancelar): " + Style.RESET_ALL).strip()
     if not seleccion.isdigit():
         return
 
@@ -44,7 +48,7 @@ def menu_quitar_ruta():
     if 0 <= idx < len(rutas_actuales):
         gestor_rutas.quitar_ruta(rutas_actuales[idx], rutas_actuales)
     else:
-        print("Opción inválida.")
+        print(Fore.RED + "Opción inválida.")
 
 def iniciar_analisis():
     # 1. Validar rutas
@@ -55,56 +59,56 @@ def iniciar_analisis():
     # Preguntar qué carpeta analizar
     carpetas_a_analizar = []
     if len(rutas_configuradas) > 1:
-        print("\nTienes múltiples carpetas configuradas:")
-        print("0. Analizar todas")
+        print(Fore.CYAN + "\nTienes múltiples carpetas configuradas:")
+        print(Fore.GREEN + "0." + Style.RESET_ALL + " Analizar todas")
         for i, r in enumerate(rutas_configuradas, 1):
-            print(f"{i}. {r}")
+            print(f"{Fore.GREEN}{i}.{Style.RESET_ALL} {r}")
 
-        seleccion = input("Selecciona una opción: ").strip()
+        seleccion = input(Fore.CYAN + "Selecciona una opción: " + Style.RESET_ALL).strip()
         if seleccion == "0":
             carpetas_a_analizar = rutas_configuradas
         elif seleccion.isdigit() and 1 <= int(seleccion) <= len(rutas_configuradas):
             carpetas_a_analizar = [rutas_configuradas[int(seleccion) - 1]]
         else:
-            print("Selección inválida. Cancelando análisis.")
+            print(Fore.RED + "Selección inválida. Cancelando análisis.")
             return
     else:
         carpetas_a_analizar = rutas_configuradas
 
-    print("\n[1/4] Conectando con LM Studio y obteniendo modelo activo...")
+    print(Fore.MAGENTA + "\n[1/4] Conectando con LM Studio y obteniendo modelo activo...")
     modelo_id, limite_tokens, client = conexion_ia.obtener_modelo_activo_y_limite()
 
     if client is None:
         return
 
-    print(f"[2/4] Escaneando carpetas seleccionadas...")
+    print(Fore.MAGENTA + f"[2/4] Escaneando carpetas seleccionadas...")
     todos_los_archivos = []
     for carpeta in carpetas_a_analizar:
         archivos = lector_archivos.escanear_carpeta(carpeta)
         todos_los_archivos.extend(archivos)
 
     if not todos_los_archivos:
-        print("No se encontraron archivos .txt, .md o .docx en las rutas especificadas.")
+        print(Fore.YELLOW + "No se encontraron archivos .txt, .md o .docx en las rutas especificadas.")
         return
 
     if len(todos_los_archivos) > analizador_notas.MAX_NOTAS:
-        print(f"\n[ADVERTENCIA] Se encontraron {len(todos_los_archivos)} archivos. Para evitar saturación, solo se evaluarán los primeros {analizador_notas.MAX_NOTAS}.")
+        print(Fore.RED + f"\n[ADVERTENCIA] Se encontraron {len(todos_los_archivos)} archivos. Para evitar saturación, solo se evaluarán los primeros {analizador_notas.MAX_NOTAS}.")
         todos_los_archivos = todos_los_archivos[:analizador_notas.MAX_NOTAS]
     else:
-        print(f"Se encontraron {len(todos_los_archivos)} archivos. Iniciando filtrado y lectura...")
+        print(Fore.GREEN + f"Se encontraron {len(todos_los_archivos)} archivos. Iniciando filtrado y lectura...")
 
     notas_procesadas = []
 
-    print(f"[3/4] Analizando contenido con IA (Modelo: {modelo_id}) ...")
-    print(f"[!] Puedes presionar CTRL+C en cualquier momento para cancelar el análisis y volver al menú.")
+    print(Fore.MAGENTA + f"[3/4] Analizando contenido con IA (Modelo: {modelo_id}) ...")
+    print(Fore.YELLOW + f"[!] Puedes presionar CTRL+C en cualquier momento para cancelar el análisis y volver al menú.")
 
     try:
         for idx, archivo in enumerate(todos_los_archivos, 1):
             if len(notas_procesadas) >= analizador_notas.MAX_NOTAS:
-                print(f"\n[INFO] Se ha alcanzado el límite máximo de {analizador_notas.MAX_NOTAS} notas procesadas. Deteniendo escaneo.")
+                print(Fore.BLUE + f"\n[INFO] Se ha alcanzado el límite máximo de {analizador_notas.MAX_NOTAS} notas procesadas. Deteniendo escaneo.")
                 break
 
-            print(f"   -> Evaluando archivo {idx}/{len(todos_los_archivos)}: {archivo}")
+            print(f"   -> Evaluando archivo {idx}/{len(todos_los_archivos)}: {Fore.CYAN}{archivo}{Style.RESET_ALL}")
             texto = lector_archivos.extraer_texto(archivo)
 
             if not texto or not texto.strip():
@@ -122,26 +126,26 @@ def iniciar_analisis():
                     "resumen": resumen
                 })
     except KeyboardInterrupt:
-        print("\n\n[!] Análisis interrumpido por el usuario (CTRL+C).")
+        print(Fore.RED + "\n\n[!] Análisis interrumpido por el usuario (CTRL+C).")
         if not notas_procesadas:
-            print("No se procesaron notas antes de la interrupción.")
+            print(Fore.YELLOW + "No se procesaron notas antes de la interrupción.")
             return
 
-    print(f"\n[4/4] Finalizando y generando resultados...")
+    print(Fore.MAGENTA + f"\n[4/4] Finalizando y generando resultados...")
     generador_resultados.presentar_resultados(notas_procesadas)
 
 def mostrar_menu():
     while True:
-        print("\n" + "="*40)
-        print("    ASISTENTE DE NOTAS IA (LM STUDIO)    ")
-        print("="*40)
-        print("1. Agregar rutas de carpetas.")
-        print("2. Quitar rutas de carpetas.")
-        print("3. Iniciar análisis e interacción con la IA.")
-        print("4. Salir.")
-        print("="*40)
+        print(Fore.BLUE + "\n" + "="*40)
+        print(Fore.CYAN + Style.BRIGHT + "    ASISTENTE DE NOTAS IA (LM STUDIO)    ")
+        print(Fore.BLUE + "="*40)
+        print(f"{Fore.GREEN}1.{Style.RESET_ALL} Agregar rutas de carpetas.")
+        print(f"{Fore.GREEN}2.{Style.RESET_ALL} Quitar rutas de carpetas.")
+        print(f"{Fore.GREEN}3.{Style.RESET_ALL} Iniciar análisis e interacción con la IA.")
+        print(f"{Fore.GREEN}4.{Style.RESET_ALL} Salir.")
+        print(Fore.BLUE + "="*40)
 
-        opcion = input("Selecciona una opción (1-4): ").strip()
+        opcion = input(Fore.CYAN + "Selecciona una opción (1-4): " + Style.RESET_ALL).strip()
 
         if opcion == '1':
             menu_agregar_ruta()
@@ -150,10 +154,10 @@ def mostrar_menu():
         elif opcion == '3':
             iniciar_analisis()
         elif opcion == '4':
-            print("Saliendo del programa. ¡Hasta luego!")
+            print(Fore.GREEN + "Saliendo del programa. ¡Hasta luego!")
             sys.exit(0)
         else:
-            print("Opción inválida. Intenta nuevamente.")
+            print(Fore.RED + "Opción inválida. Intenta nuevamente.")
 
 if __name__ == "__main__":
     mostrar_menu()
